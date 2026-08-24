@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Borrower {
+  id         Int      @id @default(autoincrement())
+  firstName  String
+  lastName   String
+  phone      String
+  email      String?
+  address    String?
+  notes      String?
+  createdAt  DateTime @default(now())
+  loans      Loan[]
+  payments   Payment[]
+}
+
+model Loan {
+  id              Int           @id @default(autoincrement())
+  borrowerId      Int
+  amount          Float
+  givenDate       DateTime
+  numInstallments Int
+  status          String        @default("active")
+  notes           String?
+  createdAt       DateTime      @default(now())
+  borrower        Borrower      @relation(fields: [borrowerId], references: [id])
+  installments    Installment[]
+  payments        Payment[]
+}
+
+model Installment {
+  id          Int          @id @default(autoincrement())
+  loanId      Int
+  number      Int
+  dueDate     DateTime
+  amount      Float
+  paid        Float        @default(0)
+  status      String       @default("pending")
+  loan        Loan         @relation(fields: [loanId], references: [id])
+  allocations Allocation[]
+}
+
+model Payment {
+  id          Int          @id @default(autoincrement())
+  loanId      Int
+  borrowerId  Int
+  paymentDate DateTime
+  amount      Float
+  notes       String?
+  createdAt   DateTime     @default(now())
+  loan        Loan         @relation(fields: [loanId], references: [id])
+  borrower    Borrower     @relation(fields: [borrowerId], references: [id])
+  allocations Allocation[]
+}
+
+model Allocation {
+  id              Int         @id @default(autoincrement())
+  paymentId       Int
+  installmentId   Int
+  allocatedAmount Float
+  payment         Payment     @relation(fields: [paymentId], references: [id])
+  installment     Installment @relation(fields: [installmentId], references: [id])
+}
+
+model Setting {
+  key   String @id
+  value String
+}
