@@ -1,0 +1,58 @@
+.borrower-modal {
+  border: none;
+  border-radius: 16px;
+  padding: 0;
+  width: min(420px, 92vw);
+  box-shadow: 0 20px 50px rgba(43, 42, 40, 0.2);
+}
+
+.borrower-modal::backdrop {
+  background: rgba(43, 42, 40, 0.4);
+}
+
+.borrower-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px;
+}
+
+.borrower-modal h2 {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.borrower-modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.borrower-modal input {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.borrower-modal input:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 14px;
+  margin: 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}

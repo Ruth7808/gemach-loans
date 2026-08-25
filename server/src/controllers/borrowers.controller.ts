@@ -26,11 +26,23 @@ function optionalString(value: unknown, field: string): string | null | undefine
   return value;
 }
 
+const EPSILON = 1e-6;
+
 export async function list(_req: Request, res: Response) {
   const borrowers = await prisma.borrower.findMany({
     orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+    include: { loans: { include: { installments: true } } },
   });
-  res.json(borrowers);
+
+  const now = new Date();
+  const result = borrowers.map(({ loans, ...borrower }) => {
+    const installments = loans.flatMap((loan) => loan.installments);
+    const totalOwed = installments.reduce((sum, i) => sum + (i.amount - i.paid), 0);
+    const isLate = installments.some((i) => i.dueDate < now && i.paid < i.amount - EPSILON);
+    return { ...borrower, totalOwed: Math.round(totalOwed * 100) / 100, isLate };
+  });
+
+  res.json(result);
 }
 
 export async function getById(req: Request, res: Response) {

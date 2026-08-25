@@ -8,11 +8,16 @@ const links = [
 
 export function Nav() {
   return (
-    <nav>
+    <nav className="app-nav">
+      <h2>גמ"ח כספים</h2>
       <ul>
         {links.map((link) => (
           <li key={link.to}>
-            <NavLink to={link.to} end={link.to === '/'}>
+            <NavLink
+              to={link.to}
+              end={link.to === '/'}
+              className={({ isActive }) => (isActive ? 'active' : undefined)}
+            >
               {link.label}
             </NavLink>
           </li>
