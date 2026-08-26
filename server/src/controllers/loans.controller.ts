@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prismaClient";
 import { HttpError } from "../middleware/errorHandler";
+import { summarizeInstallments } from "../lib/loanMath";
 
 function parseId(raw: string | string[]): number {
   const id = Number(Array.isArray(raw) ? raw[0] : raw);
@@ -40,10 +41,17 @@ function parseDate(value: unknown, field: string): Date {
 
 export async function list(_req: Request, res: Response) {
   const loans = await prisma.loan.findMany({
-    include: { borrower: true },
+    include: { borrower: true, installments: true },
     orderBy: { createdAt: "desc" },
   });
-  res.json(loans);
+
+  const now = new Date();
+  const result = loans.map(({ installments, ...loan }) => ({
+    ...loan,
+    ...summarizeInstallments(installments, now),
+  }));
+
+  res.json(result);
 }
 
 export async function getById(req: Request, res: Response) {

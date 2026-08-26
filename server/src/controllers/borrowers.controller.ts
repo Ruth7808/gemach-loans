@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prismaClient";
 import { HttpError } from "../middleware/errorHandler";
+import { summarizeInstallments } from "../lib/loanMath";
 
 function parseId(raw: string | string[]): number {
   const id = Number(Array.isArray(raw) ? raw[0] : raw);
@@ -26,12 +27,6 @@ function optionalString(value: unknown, field: string): string | null | undefine
   return value;
 }
 
-const EPSILON = 1e-6;
-
-function roundCents(n: number): number {
-  return Math.round(n * 100) / 100;
-}
-
 interface LoanWithInstallments {
   id: number;
   amount: number;
@@ -41,20 +36,22 @@ interface LoanWithInstallments {
   installments: { amount: number; paid: number; dueDate: Date }[];
 }
 
-/** מחשבת יתרה ואיחור לכל הלוואה ובסך הכל, מתוך loans+installments — נקודה יחידה לחישוב הזה. */
+/** מחשבת יתרה ואיחור לכל הלוואה ובסך הכל, מתוך loans+installments — משתמשת בחישוב המשותף לכל הלוואה בודדת. */
 function summarizeLoans(loans: LoanWithInstallments[], now: Date) {
-  const loanSummaries = loans.map((loan) => ({
-    id: loan.id,
-    amount: loan.amount,
-    givenDate: loan.givenDate,
-    numInstallments: loan.numInstallments,
-    status: loan.status,
-    remaining: roundCents(loan.installments.reduce((sum, i) => sum + (i.amount - i.paid), 0)),
-  }));
+  const loanSummaries = loans.map((loan) => {
+    const { remaining } = summarizeInstallments(loan.installments, now);
+    return {
+      id: loan.id,
+      amount: loan.amount,
+      givenDate: loan.givenDate,
+      numInstallments: loan.numInstallments,
+      status: loan.status,
+      remaining,
+    };
+  });
 
   const allInstallments = loans.flatMap((loan) => loan.installments);
-  const totalOwed = roundCents(allInstallments.reduce((sum, i) => sum + (i.amount - i.paid), 0));
-  const isLate = allInstallments.some((i) => i.dueDate < now && i.paid < i.amount - EPSILON);
+  const { remaining: totalOwed, isLate } = summarizeInstallments(allInstallments, now);
 
   return { totalOwed, isLate, loans: loanSummaries };
 }

@@ -73,3 +73,22 @@ export interface BorrowerDetail extends Borrower {
 export function getBorrower(id: number): Promise<BorrowerDetail> {
   return apiFetch(`/borrowers/${id}`);
 }
+
+export interface Loan {
+  id: number;
+  borrowerId: number;
+  amount: number;
+  givenDate: string;
+  numInstallments: number;
+  status: string;
+  notes: string | null;
+  createdAt: string;
+  borrower: { id: number; firstName: string; lastName: string };
+  remaining: number;
+  isLate: boolean;
+  nextDueDate: string | null;
+}
+
+export function listLoans(): Promise<Loan[]> {
+  return apiFetch('/loans');
+}
