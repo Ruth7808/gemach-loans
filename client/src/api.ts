@@ -56,3 +56,20 @@ export function updateBorrower(id: number, data: NewBorrower): Promise<Borrower>
     body: JSON.stringify(data),
   });
 }
+
+export interface LoanSummary {
+  id: number;
+  amount: number;
+  givenDate: string;
+  numInstallments: number;
+  status: string;
+  remaining: number;
+}
+
+export interface BorrowerDetail extends Borrower {
+  loans: LoanSummary[];
+}
+
+export function getBorrower(id: number): Promise<BorrowerDetail> {
+  return apiFetch(`/borrowers/${id}`);
+}

@@ -28,6 +28,37 @@ function optionalString(value: unknown, field: string): string | null | undefine
 
 const EPSILON = 1e-6;
 
+function roundCents(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
+interface LoanWithInstallments {
+  id: number;
+  amount: number;
+  givenDate: Date;
+  numInstallments: number;
+  status: string;
+  installments: { amount: number; paid: number; dueDate: Date }[];
+}
+
+/** מחשבת יתרה ואיחור לכל הלוואה ובסך הכל, מתוך loans+installments — נקודה יחידה לחישוב הזה. */
+function summarizeLoans(loans: LoanWithInstallments[], now: Date) {
+  const loanSummaries = loans.map((loan) => ({
+    id: loan.id,
+    amount: loan.amount,
+    givenDate: loan.givenDate,
+    numInstallments: loan.numInstallments,
+    status: loan.status,
+    remaining: roundCents(loan.installments.reduce((sum, i) => sum + (i.amount - i.paid), 0)),
+  }));
+
+  const allInstallments = loans.flatMap((loan) => loan.installments);
+  const totalOwed = roundCents(allInstallments.reduce((sum, i) => sum + (i.amount - i.paid), 0));
+  const isLate = allInstallments.some((i) => i.dueDate < now && i.paid < i.amount - EPSILON);
+
+  return { totalOwed, isLate, loans: loanSummaries };
+}
+
 export async function list(_req: Request, res: Response) {
   const borrowers = await prisma.borrower.findMany({
     orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
@@ -36,10 +67,8 @@ export async function list(_req: Request, res: Response) {
 
   const now = new Date();
   const result = borrowers.map(({ loans, ...borrower }) => {
-    const installments = loans.flatMap((loan) => loan.installments);
-    const totalOwed = installments.reduce((sum, i) => sum + (i.amount - i.paid), 0);
-    const isLate = installments.some((i) => i.dueDate < now && i.paid < i.amount - EPSILON);
-    return { ...borrower, totalOwed: Math.round(totalOwed * 100) / 100, isLate };
+    const { totalOwed, isLate } = summarizeLoans(loans, now);
+    return { ...borrower, totalOwed, isLate };
   });
 
   res.json(result);
@@ -47,11 +76,17 @@ export async function list(_req: Request, res: Response) {
 
 export async function getById(req: Request, res: Response) {
   const id = parseId(req.params.id);
-  const borrower = await prisma.borrower.findUnique({ where: { id } });
+  const borrower = await prisma.borrower.findUnique({
+    where: { id },
+    include: { loans: { include: { installments: true } } },
+  });
   if (!borrower) {
     throw new HttpError(404, "הלווה לא נמצא");
   }
-  res.json(borrower);
+
+  const { loans, ...rest } = borrower;
+  const { totalOwed, isLate, loans: loanSummaries } = summarizeLoans(loans, new Date());
+  res.json({ ...rest, totalOwed, isLate, loans: loanSummaries });
 }
 
 export async function create(req: Request, res: Response) {
