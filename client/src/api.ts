@@ -92,3 +92,66 @@ export interface Loan {
 export function listLoans(): Promise<Loan[]> {
   return apiFetch('/loans');
 }
+
+export interface Installment {
+  id: number;
+  loanId: number;
+  number: number;
+  dueDate: string;
+  amount: number;
+  paid: number;
+  status: string;
+}
+
+export interface Allocation {
+  id: number;
+  paymentId: number;
+  installmentId: number;
+  allocatedAmount: number;
+}
+
+export interface Payment {
+  id: number;
+  loanId: number;
+  borrowerId: number;
+  paymentDate: string;
+  amount: number;
+  notes: string | null;
+  createdAt: string;
+  allocations: Allocation[];
+}
+
+export interface LoanDetail {
+  id: number;
+  borrowerId: number;
+  amount: number;
+  givenDate: string;
+  numInstallments: number;
+  status: string;
+  notes: string | null;
+  createdAt: string;
+  borrower: { id: number; firstName: string; lastName: string };
+  installments: Installment[];
+  payments: Payment[];
+  remaining: number;
+  isLate: boolean;
+  nextDueDate: string | null;
+}
+
+export function getLoan(id: number): Promise<LoanDetail> {
+  return apiFetch(`/loans/${id}`);
+}
+
+export interface NewPayment {
+  loanId: number;
+  amount: number;
+  paymentDate: string;
+  notes?: string;
+}
+
+export function createPayment(data: NewPayment): Promise<Payment> {
+  return apiFetch('/payments', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}

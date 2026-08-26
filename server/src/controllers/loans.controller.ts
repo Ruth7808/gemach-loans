@@ -61,13 +61,15 @@ export async function getById(req: Request, res: Response) {
     include: {
       borrower: true,
       installments: { orderBy: { number: "asc" } },
-      payments: { orderBy: { paymentDate: "asc" } },
+      payments: { orderBy: { paymentDate: "asc" }, include: { allocations: true } },
     },
   });
   if (!loan) {
     throw new HttpError(404, "הלוואה לא נמצאה");
   }
-  res.json(loan);
+
+  const { installments, ...rest } = loan;
+  res.json({ ...rest, installments, ...summarizeInstallments(installments, new Date()) });
 }
 
 export async function create(req: Request, res: Response) {
