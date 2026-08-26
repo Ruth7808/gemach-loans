@@ -125,3 +125,18 @@
 .status-ok::before {
   background: var(--primary);
 }
+
+.edit-link {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.edit-link:hover {
+  background: var(--primary-bg);
+}

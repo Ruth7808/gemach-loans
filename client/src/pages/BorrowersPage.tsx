@@ -11,6 +11,7 @@ export function BorrowersPage() {
   const [search, setSearch] = useState('');
   const [sortLateFirst, setSortLateFirst] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingBorrower, setEditingBorrower] = useState<Borrower | null>(null);
   const navigate = useNavigate();
 
   function refresh() {
@@ -32,9 +33,10 @@ export function BorrowersPage() {
 
   const lateCount = borrowers?.filter((b) => b.isLate).length ?? 0;
 
-  function handleCreated() {
+  function handleSaved() {
     refresh();
     setShowAddModal(false);
+    setEditingBorrower(null);
   }
 
   return (
@@ -81,6 +83,7 @@ export function BorrowersPage() {
                   סטטוס
                 </button>
               </th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -98,14 +101,30 @@ export function BorrowersPage() {
                     {b.isLate ? 'באיחור' : 'לא באיחור'}
                   </span>
                 </td>
+                <td>
+                  <button
+                    className="edit-link"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingBorrower(b);
+                    }}
+                  >
+                    עריכה
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
 
-      {showAddModal && (
-        <BorrowerFormModal onClose={() => setShowAddModal(false)} onCreated={handleCreated} />
+      {showAddModal && <BorrowerFormModal onClose={() => setShowAddModal(false)} onSaved={handleSaved} />}
+      {editingBorrower && (
+        <BorrowerFormModal
+          borrower={editingBorrower}
+          onClose={() => setEditingBorrower(null)}
+          onSaved={handleSaved}
+        />
       )}
     </div>
   );

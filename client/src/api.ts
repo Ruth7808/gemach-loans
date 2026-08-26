@@ -49,3 +49,10 @@ export function createBorrower(data: NewBorrower): Promise<Borrower> {
     body: JSON.stringify(data),
   });
 }
+
+export function updateBorrower(id: number, data: NewBorrower): Promise<Borrower> {
+  return apiFetch(`/borrowers/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
