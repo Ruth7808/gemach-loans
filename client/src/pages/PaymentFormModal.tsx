@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPayment } from '../api';
+import { today } from '../dateUtils';
 import './PaymentFormModal.css';
 
 interface Props {
@@ -10,10 +11,6 @@ interface Props {
 }
 
 const currency = new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' });
-
-function today(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export function PaymentFormModal({ loanId, remaining, onClose, onSaved }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);

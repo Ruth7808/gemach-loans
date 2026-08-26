@@ -155,3 +155,19 @@ export function createPayment(data: NewPayment): Promise<Payment> {
     body: JSON.stringify(data),
   });
 }
+
+export interface NewLoan {
+  borrowerId: number;
+  amount: number;
+  numInstallments: number;
+  givenDate: string;
+  installmentDueDates: string[];
+  notes?: string;
+}
+
+export function createLoan(data: NewLoan): Promise<LoanDetail> {
+  return apiFetch('/loans', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}

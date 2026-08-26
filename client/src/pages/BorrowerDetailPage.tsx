@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { getBorrower, type BorrowerDetail } from '../api';
 import { BorrowerFormModal } from './BorrowerFormModal';
+import { LoanFormModal } from './LoanFormModal';
 import './BorrowersPage.css';
 import './BorrowerDetailPage.css';
 
@@ -13,6 +14,7 @@ export function BorrowerDetailPage() {
   const navigate = useNavigate();
   const [borrower, setBorrower] = useState<BorrowerDetail | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddLoanModal, setShowAddLoanModal] = useState(false);
 
   function refresh() {
     getBorrower(Number(id)).then(setBorrower);
@@ -45,9 +47,14 @@ export function BorrowerDetailPage() {
           </p>
           {borrower.notes && <p className="borrower-notes">{borrower.notes}</p>}
         </div>
-        <button className="btn-secondary" onClick={() => setShowEditModal(true)}>
-          עריכה
-        </button>
+        <div className="header-actions">
+          <button className="btn-secondary" onClick={() => setShowEditModal(true)}>
+            עריכה
+          </button>
+          <button className="btn-primary" onClick={() => setShowAddLoanModal(true)}>
+            הוסף הלוואה
+          </button>
+        </div>
       </div>
 
       <div className={`balance-tile ${borrower.isLate ? 'balance-late' : ''}`}>
@@ -94,6 +101,17 @@ export function BorrowerDetailPage() {
           onSaved={() => {
             refresh();
             setShowEditModal(false);
+          }}
+        />
+      )}
+
+      {showAddLoanModal && (
+        <LoanFormModal
+          borrowerId={borrower.id}
+          onClose={() => setShowAddLoanModal(false)}
+          onSaved={() => {
+            refresh();
+            setShowAddLoanModal(false);
           }}
         />
       )}
