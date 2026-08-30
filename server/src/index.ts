@@ -2,6 +2,8 @@ import express from "express";
 import { borrowersRouter } from "./routes/borrowers.routes";
 import { loansRouter } from "./routes/loans.routes";
 import { paymentsRouter } from "./routes/payments.routes";
+import { settingsRouter } from "./routes/settings.routes";
+import { dashboardRouter } from "./routes/dashboard.routes";
 import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
@@ -16,6 +18,8 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/borrowers", borrowersRouter);
 app.use("/api/loans", loansRouter);
 app.use("/api/payments", paymentsRouter);
+app.use("/api/settings", settingsRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 app.use(errorHandler);
 

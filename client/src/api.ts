@@ -171,3 +171,37 @@ export function createLoan(data: NewLoan): Promise<LoanDetail> {
     body: JSON.stringify(data),
   });
 }
+
+export interface MonthlyPoint {
+  month: string;
+  amount: number;
+  isCurrent: boolean;
+}
+
+export interface DueTodayItem {
+  installmentId: number;
+  loanId: number;
+  borrowerId: number;
+  borrowerName: string;
+  amount: number;
+}
+
+export interface DashboardData {
+  openingBalance: number;
+  availableFunds: number;
+  expectedThisMonth: number;
+  dueToday: DueTodayItem[];
+  monthlyCollected: MonthlyPoint[];
+  monthlyForecast: MonthlyPoint[];
+}
+
+export function getDashboard(): Promise<DashboardData> {
+  return apiFetch('/dashboard');
+}
+
+export function updateOpeningBalance(value: number): Promise<{ value: number }> {
+  return apiFetch('/settings/opening-balance', {
+    method: 'PUT',
+    body: JSON.stringify({ value }),
+  });
+}
