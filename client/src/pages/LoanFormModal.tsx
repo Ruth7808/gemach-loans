@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { createLoan } from '../api';
+import { createLoan, checkLoanRisk, type LoanRiskCheck } from '../api';
 import { today, toLocalISODate } from '../dateUtils';
 import './LoanFormModal.css';
 
@@ -17,6 +17,7 @@ interface FieldErrors {
 }
 
 const currency = new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' });
+const dateFormat = new Intl.DateTimeFormat('he-IL');
 
 function addMonthsClamped(date: Date, months: number): Date {
   const day = date.getDate();
@@ -36,8 +37,10 @@ function generateSchedule(firstDueDate: string, count: number): string[] {
 export function LoanFormModal({ borrowerId, onClose, onSaved }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [saving, setSaving] = useState(false);
+  const [checkingRisk, setCheckingRisk] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [riskWarning, setRiskWarning] = useState<LoanRiskCheck | null>(null);
 
   const [amount, setAmount] = useState('');
   const [givenDate, setGivenDate] = useState(today());
@@ -72,13 +75,7 @@ export function LoanFormModal({ borrowerId, onClose, onSaved }: Props) {
     return next;
   }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const validationErrors = validate();
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) return;
-
+  async function submitLoan() {
     setSaving(true);
     setSubmitError(null);
     try {
@@ -94,6 +91,29 @@ export function LoanFormModal({ borrowerId, onClose, onSaved }: Props) {
     } catch {
       setSubmitError('יצירת ההלוואה נכשלה. נסי שוב.');
       setSaving(false);
+    }
+  }
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
+
+    setCheckingRisk(true);
+    setSubmitError(null);
+    try {
+      const risk = await checkLoanRisk(amountNum);
+      setCheckingRisk(false);
+      if (risk.insufficientFunds || risk.newlyAtRisk.length > 0) {
+        setRiskWarning(risk);
+        return;
+      }
+      await submitLoan();
+    } catch {
+      setCheckingRisk(false);
+      setSubmitError('בדיקת הסיכון נכשלה. נסי שוב.');
     }
   }
 
@@ -177,13 +197,50 @@ export function LoanFormModal({ borrowerId, onClose, onSaved }: Props) {
 
         {submitError && <p className="form-error">{submitError}</p>}
 
+        {riskWarning && (
+          <div className="risk-warning">
+            {riskWarning.insufficientFunds && (
+              <p className="risk-warning-severe">
+                אין מספיק כסף פנוי להלוואה זו — חסר {currency.format(riskWarning.shortfallAmount)}.
+              </p>
+            )}
+            {riskWarning.newlyAtRisk.length > 0 && (
+              <div className="risk-warning-moderate">
+                <p>הלוואה זו תדחוף את בקשות המשיכה הבאות לסיכון:</p>
+                <ul>
+                  {riskWarning.newlyAtRisk.map((r) => (
+                    <li key={r.requestId}>
+                      {r.depositorName} — תאריך יעד {dateFormat.format(new Date(r.targetDate))}, חוסר{' '}
+                      {currency.format(r.shortfall)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <p className="risk-warning-note">אפשר לאשר ולשמור בכל זאת — ההחלטה בידייך.</p>
+          </div>
+        )}
+
         <div className="modal-actions">
-          <button type="button" className="btn-secondary" onClick={onClose} disabled={saving}>
-            ביטול
-          </button>
-          <button type="submit" className="btn-primary" disabled={saving}>
-            {saving ? 'שומר...' : 'שמירה'}
-          </button>
+          {riskWarning ? (
+            <>
+              <button type="button" className="btn-secondary" onClick={() => setRiskWarning(null)} disabled={saving}>
+                חזרה לעריכה
+              </button>
+              <button type="button" className="btn-primary" onClick={submitLoan} disabled={saving}>
+                {saving ? 'שומר...' : 'אשר ושמור בכל זאת'}
+              </button>
+            </>
+          ) : (
+            <>
+              <button type="button" className="btn-secondary" onClick={onClose} disabled={saving || checkingRisk}>
+                ביטול
+              </button>
+              <button type="submit" className="btn-primary" disabled={saving || checkingRisk}>
+                {checkingRisk ? 'בודק...' : saving ? 'שומר...' : 'שמירה'}
+              </button>
+            </>
+          )}
         </div>
       </form>
     </dialog>

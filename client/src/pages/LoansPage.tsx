@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { listLoans, type Loan } from '../api';
+import { LoanIcon } from '../icons';
 import './BorrowersPage.css';
 import './LoansPage.css';
 
@@ -62,8 +63,11 @@ export function LoansPage() {
   }, [loans, tab]);
 
   return (
-    <div>
-      <h1>הלוואות</h1>
+    <div className="page page-loans">
+      <h1 className="page-title-with-icon">
+        <span className="page-header-icon"><LoanIcon size={26} /></span>
+        הלוואות
+      </h1>
 
       <div className="tabs">
         {TABS.map((t) => (

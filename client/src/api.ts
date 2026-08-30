@@ -7,7 +7,8 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`שגיאה בפנייה לשרת: ${response.status}`);
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error || `שגיאה בפנייה לשרת: ${response.status}`);
   }
 
   return response.json() as Promise<T>;
@@ -186,6 +187,14 @@ export interface DueTodayItem {
   amount: number;
 }
 
+export interface AtRiskWithdrawal {
+  requestId: number;
+  depositorId: number;
+  depositorName: string;
+  targetDate: string;
+  shortfall: number;
+}
+
 export interface DashboardData {
   openingBalance: number;
   availableFunds: number;
@@ -193,6 +202,10 @@ export interface DashboardData {
   dueToday: DueTodayItem[];
   monthlyCollected: MonthlyPoint[];
   monthlyForecast: MonthlyPoint[];
+  depositorsBalance: number;
+  openWithdrawalRequestsCount: number;
+  openWithdrawalRequestsTotal: number;
+  atRiskWithdrawals: AtRiskWithdrawal[];
 }
 
 export function getDashboard(): Promise<DashboardData> {
@@ -203,5 +216,163 @@ export function updateOpeningBalance(value: number): Promise<{ value: number }> 
   return apiFetch('/settings/opening-balance', {
     method: 'PUT',
     body: JSON.stringify({ value }),
+  });
+}
+
+export interface Depositor {
+  id: number;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string | null;
+  address: string | null;
+  notes: string | null;
+  createdAt: string;
+  totalDeposits: number;
+}
+
+export interface NewDepositor {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string;
+  address?: string;
+  notes?: string;
+}
+
+export function listDepositors(): Promise<Depositor[]> {
+  return apiFetch('/depositors');
+}
+
+export function createDepositor(data: NewDepositor): Promise<Depositor> {
+  return apiFetch('/depositors', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateDepositor(id: number, data: NewDepositor): Promise<Depositor> {
+  return apiFetch(`/depositors/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export interface Deposit {
+  id: number;
+  depositorId: number;
+  amount: number;
+  date: string;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface WithdrawalRequest {
+  id: number;
+  depositorId: number;
+  amount: number;
+  requestDate: string;
+  targetDate: string;
+  status: string;
+  paidSoFar: number;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  remaining: number;
+  isReady: boolean;
+  isAtRisk: boolean;
+  shortfall: number;
+}
+
+export interface WithdrawalRequestWithDepositor extends WithdrawalRequest {
+  depositor: { id: number; firstName: string; lastName: string };
+}
+
+export interface DepositorDetail extends Depositor {
+  deposits: Deposit[];
+  withdrawalRequests: WithdrawalRequest[];
+}
+
+export interface Withdrawal {
+  id: number;
+  withdrawalRequestId: number | null;
+  depositorId: number;
+  amount: number;
+  date: string;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface WithdrawalRequestDetail extends WithdrawalRequestWithDepositor {
+  withdrawals: Withdrawal[];
+}
+
+export interface NewWithdrawalRequest {
+  depositorId: number;
+  amount: number;
+  notes?: string;
+}
+
+export function listWithdrawalRequests(depositorId?: number): Promise<WithdrawalRequestWithDepositor[]> {
+  return apiFetch(depositorId !== undefined ? `/withdrawal-requests?depositorId=${depositorId}` : '/withdrawal-requests');
+}
+
+export function getWithdrawalRequest(id: number): Promise<WithdrawalRequestDetail> {
+  return apiFetch(`/withdrawal-requests/${id}`);
+}
+
+export function createWithdrawalRequest(data: NewWithdrawalRequest): Promise<WithdrawalRequestWithDepositor> {
+  return apiFetch('/withdrawal-requests', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export function cancelWithdrawalRequest(id: number): Promise<WithdrawalRequestWithDepositor> {
+  return apiFetch(`/withdrawal-requests/${id}/cancel`, { method: 'POST' });
+}
+
+export interface NewWithdrawalPayment {
+  amount: number;
+  date: string;
+  notes?: string;
+}
+
+export function payWithdrawalRequest(id: number, data: NewWithdrawalPayment): Promise<WithdrawalRequestDetail> {
+  return apiFetch(`/withdrawal-requests/${id}/pay`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export interface LoanRiskCheck {
+  hypotheticalAvailableFunds: number;
+  insufficientFunds: boolean;
+  shortfallAmount: number;
+  newlyAtRisk: { requestId: number; depositorName: string; targetDate: string; shortfall: number }[];
+}
+
+export function checkLoanRisk(amount: number): Promise<LoanRiskCheck> {
+  return apiFetch('/loans/check-risk', {
+    method: 'POST',
+    body: JSON.stringify({ amount }),
+  });
+}
+
+export function getDepositor(id: number): Promise<DepositorDetail> {
+  return apiFetch(`/depositors/${id}`);
+}
+
+export interface NewDeposit {
+  depositorId: number;
+  amount: number;
+  date: string;
+  notes?: string;
+}
+
+export function createDeposit(data: NewDeposit): Promise<Deposit> {
+  return apiFetch('/deposits', {
+    method: 'POST',
+    body: JSON.stringify(data),
   });
 }

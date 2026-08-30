@@ -9,7 +9,7 @@
   }
 }
 
-.borrower-modal {
+.depositor-modal {
   border: none;
   border-radius: 16px;
   padding: 0;
@@ -19,25 +19,25 @@
   animation: modal-in 0.18s ease-out;
 }
 
-.borrower-modal::backdrop {
+.depositor-modal::backdrop {
   background: rgba(43, 42, 40, 0.4);
 }
 
-.modal-header {
+.depositor-modal .modal-header {
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 24px 28px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-hover));
   color: #fff;
 }
 
-.modal-header h2 {
+.depositor-modal .modal-header h2 {
   color: #fff;
   font-size: 21px;
 }
 
-.modal-avatar {
+.depositor-modal .modal-avatar {
   flex-shrink: 0;
   width: 44px;
   height: 44px;
@@ -52,20 +52,20 @@
   font-size: 16px;
 }
 
-.borrower-modal form {
+.depositor-modal form {
   display: flex;
   flex-direction: column;
   gap: 14px;
   padding: 24px 28px 28px;
 }
 
-.field-row {
+.depositor-modal .field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
 }
 
-.borrower-modal label {
+.depositor-modal label {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -74,11 +74,11 @@
   font-weight: 500;
 }
 
-.input-wrap {
+.depositor-modal .input-wrap {
   position: relative;
 }
 
-.field-icon {
+.depositor-modal .field-icon {
   position: absolute;
   inset-inline-start: 10px;
   top: 50%;
@@ -87,7 +87,7 @@
   pointer-events: none;
 }
 
-.borrower-modal input {
+.depositor-modal input {
   width: 100%;
   padding: 10px 12px;
   padding-inline-start: 36px;
@@ -97,32 +97,32 @@
   color: var(--text);
 }
 
-.borrower-modal input:focus {
-  outline: 2px solid var(--primary);
+.depositor-modal input:focus {
+  outline: 2px solid var(--accent-purple);
   outline-offset: 1px;
 }
 
-.input-wrap:focus-within .field-icon {
-  color: var(--primary);
+.depositor-modal .input-wrap:focus-within .field-icon {
+  color: var(--accent-purple);
 }
 
-.borrower-modal input[aria-invalid='true'] {
+.depositor-modal input[aria-invalid='true'] {
   border-color: var(--danger);
 }
 
-.field-error {
+.depositor-modal .field-error {
   color: var(--danger);
   font-size: 13px;
   font-weight: 400;
 }
 
-.form-error {
+.depositor-modal .form-error {
   color: var(--danger);
   font-size: 14px;
   margin: 0;
 }
 
-.modal-actions {
+.depositor-modal .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;

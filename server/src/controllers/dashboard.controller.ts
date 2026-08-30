@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prismaClient";
 import { roundCents } from "../lib/loanMath";
+import { getAvailableFunds, calculateWithdrawalRisk } from "../lib/withdrawalRisk";
 
 const EPSILON = 1e-6;
-const OPENING_BALANCE_KEY = "openingBalance";
 
 function monthKey(d: Date): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
@@ -17,33 +17,66 @@ function monthKeys(base: Date, offsets: number[]): string[] {
   return offsets.map((offset) => monthKey(monthStart(base, offset)));
 }
 
+const OPENING_BALANCE_KEY = "openingBalance";
+
 export async function getDashboard(_req: Request, res: Response) {
   const now = new Date();
   const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   const tomorrowStart = new Date(todayStart);
   tomorrowStart.setUTCDate(tomorrowStart.getUTCDate() + 1);
 
-  const [openingBalanceSetting, paymentsTotal, loansTotal, dueTodayInstallments, recentPayments, upcomingInstallments] =
-    await Promise.all([
-      prisma.setting.findUnique({ where: { key: OPENING_BALANCE_KEY } }),
-      prisma.payment.aggregate({ _sum: { amount: true } }),
-      prisma.loan.aggregate({ _sum: { amount: true } }),
-      prisma.installment.findMany({
-        where: { dueDate: { gte: todayStart, lt: tomorrowStart } },
-        include: { loan: { include: { borrower: true } } },
-      }),
-      prisma.payment.findMany({
-        where: { paymentDate: { gte: monthStart(now, -5) } },
-      }),
-      prisma.installment.findMany({
-        where: { dueDate: { gte: monthStart(now, 0), lt: monthStart(now, 6) } },
-      }),
-    ]);
+  const [
+    openingBalanceSetting,
+    availableFunds,
+    depositsTotal,
+    withdrawalsPaidTotal,
+    dueTodayInstallments,
+    recentPayments,
+    upcomingInstallments,
+    openWithdrawalRequests,
+    riskResults,
+  ] = await Promise.all([
+    prisma.setting.findUnique({ where: { key: OPENING_BALANCE_KEY } }),
+    getAvailableFunds(),
+    prisma.deposit.aggregate({ _sum: { amount: true } }),
+    prisma.withdrawal.aggregate({ _sum: { amount: true } }),
+    prisma.installment.findMany({
+      where: { dueDate: { gte: todayStart, lt: tomorrowStart } },
+      include: { loan: { include: { borrower: true } } },
+    }),
+    prisma.payment.findMany({
+      where: { paymentDate: { gte: monthStart(now, -5) } },
+    }),
+    prisma.installment.findMany({
+      where: { dueDate: { gte: monthStart(now, 0), lt: monthStart(now, 6) } },
+    }),
+    prisma.withdrawalRequest.findMany({
+      where: { status: { in: ["open", "partially_paid"] } },
+      include: { depositor: true },
+    }),
+    calculateWithdrawalRisk(),
+  ]);
 
   const openingBalance = openingBalanceSetting ? Number(openingBalanceSetting.value) : 0;
-  const availableFunds = roundCents(
-    openingBalance + (paymentsTotal._sum.amount ?? 0) - (loansTotal._sum.amount ?? 0),
+  const depositorsBalance = roundCents(
+    (depositsTotal._sum.amount ?? 0) - (withdrawalsPaidTotal._sum.amount ?? 0),
   );
+
+  const openWithdrawalTotal = roundCents(
+    openWithdrawalRequests.reduce((sum, r) => sum + (r.amount - r.paidSoFar), 0),
+  );
+
+  const riskByRequestId = new Map(riskResults.map((r) => [r.requestId, r]));
+  const atRiskWithdrawals = openWithdrawalRequests
+    .map((r) => ({ request: r, risk: riskByRequestId.get(r.id) }))
+    .filter((x) => x.risk?.isAtRisk)
+    .map((x) => ({
+      requestId: x.request.id,
+      depositorId: x.request.depositorId,
+      depositorName: `${x.request.depositor.firstName} ${x.request.depositor.lastName}`,
+      targetDate: x.request.targetDate,
+      shortfall: x.risk!.shortfall,
+    }));
 
   const dueToday = dueTodayInstallments
     .filter((i) => i.paid < i.amount - EPSILON)
@@ -87,5 +120,9 @@ export async function getDashboard(_req: Request, res: Response) {
     dueToday,
     monthlyCollected,
     monthlyForecast,
+    depositorsBalance,
+    openWithdrawalRequestsCount: openWithdrawalRequests.length,
+    openWithdrawalRequestsTotal: openWithdrawalTotal,
+    atRiskWithdrawals,
   });
 }

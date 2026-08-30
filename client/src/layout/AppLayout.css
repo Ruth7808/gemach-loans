@@ -26,7 +26,9 @@
 }
 
 .app-nav a {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 14px;
   border-radius: 8px;
   color: var(--text-muted);
@@ -35,14 +37,33 @@
   transition: background 0.15s, color 0.15s;
 }
 
+.app-nav a svg {
+  flex-shrink: 0;
+}
+
 .app-nav a:hover {
   background: var(--bg);
   color: var(--text);
 }
 
-.app-nav a.active {
+.app-nav a.nav-primary.active {
   background: var(--primary-bg);
   color: var(--primary);
+}
+
+.app-nav a.nav-gold.active {
+  background: var(--accent-gold-bg);
+  color: var(--accent-gold);
+}
+
+.app-nav a.nav-purple.active {
+  background: var(--accent-purple-bg);
+  color: var(--accent-purple);
+}
+
+.app-nav a.nav-blue.active {
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue);
 }
 
 .app-main {

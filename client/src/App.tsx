@@ -5,6 +5,9 @@ import { BorrowersPage } from './pages/BorrowersPage';
 import { BorrowerDetailPage } from './pages/BorrowerDetailPage';
 import { LoansPage } from './pages/LoansPage';
 import { LoanDetailPage } from './pages/LoanDetailPage';
+import { DepositorsPage } from './pages/DepositorsPage';
+import { DepositorDetailPage } from './pages/DepositorDetailPage';
+import { WithdrawalRequestsPage } from './pages/WithdrawalRequestsPage';
 
 function App() {
   return (
@@ -15,6 +18,9 @@ function App() {
         <Route path="borrowers/:id" element={<BorrowerDetailPage />} />
         <Route path="loans" element={<LoansPage />} />
         <Route path="loans/:id" element={<LoanDetailPage />} />
+        <Route path="depositors" element={<DepositorsPage />} />
+        <Route path="depositors/:id" element={<DepositorDetailPage />} />
+        <Route path="withdrawal-requests" element={<WithdrawalRequestsPage />} />
       </Route>
     </Routes>
   );

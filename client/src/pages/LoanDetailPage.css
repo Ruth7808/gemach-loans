@@ -32,6 +32,14 @@
   border-inline-start: 3px solid var(--danger);
 }
 
+.page-loans .stats-row {
+  border-top: 3px solid var(--accent-gold);
+}
+
+.page-dashboard .stats-row {
+  border-top: 3px solid var(--primary);
+}
+
 .late-banner {
   background: var(--danger-bg);
   color: var(--danger);

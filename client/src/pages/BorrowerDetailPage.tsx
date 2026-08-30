@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { getBorrower, type BorrowerDetail } from '../api';
 import { BorrowerFormModal } from './BorrowerFormModal';
 import { LoanFormModal } from './LoanFormModal';
+import { ArrowIcon, UserIcon } from '../icons';
 import './BorrowersPage.css';
 import './BorrowerDetailPage.css';
 
@@ -29,16 +30,18 @@ export function BorrowerDetailPage() {
   const sortedLoans = [...borrower.loans].sort((a) => (a.status === 'active' ? -1 : 1));
 
   return (
-    <div>
+    <div className="page page-borrowers">
       <button className="back-link" onClick={() => navigate('/borrowers')}>
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <ArrowIcon size={18} />
         חזרה לרשימת לווים
       </button>
 
       <div className="borrower-header">
         <div>
+          <p className="card-eyebrow">
+            <UserIcon size={16} />
+            כרטיס לווה
+          </p>
           <h1>{borrower.firstName} {borrower.lastName}</h1>
           <p className="borrower-contact">
             <a href={`tel:${borrower.phone}`}>{borrower.phone}</a>

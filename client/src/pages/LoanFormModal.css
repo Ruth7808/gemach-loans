@@ -28,7 +28,7 @@
 
 .loan-modal .modal-header {
   padding: 22px 28px;
-  background: linear-gradient(135deg, var(--primary), var(--accent-gold));
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-hover));
   color: #fff;
   flex-shrink: 0;
 }
@@ -134,6 +134,46 @@
 .form-error {
   color: var(--danger);
   font-size: 14px;
+  margin: 0;
+}
+
+.risk-warning {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.risk-warning-severe {
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 0;
+}
+
+.risk-warning-moderate {
+  background: var(--status-risk-bg);
+  color: var(--status-risk);
+  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.risk-warning-moderate p {
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.risk-warning-moderate ul {
+  margin: 0;
+  padding-inline-start: 18px;
+}
+
+.risk-warning-note {
+  font-size: 13px;
+  color: var(--text-muted);
   margin: 0;
 }
 

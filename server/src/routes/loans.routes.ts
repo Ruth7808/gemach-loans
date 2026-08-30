@@ -4,6 +4,7 @@ import * as loansController from "../controllers/loans.controller";
 export const loansRouter = Router();
 
 loansRouter.get("/", loansController.list);
+loansRouter.post("/check-risk", loansController.checkRisk);
 loansRouter.get("/:id", loansController.getById);
 loansRouter.post("/", loansController.create);
 loansRouter.put("/:id", loansController.update);

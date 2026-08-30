@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { getLoan, type LoanDetail } from '../api';
 import { PaymentFormModal } from './PaymentFormModal';
+import { ArrowIcon, LoanIcon } from '../icons';
 import './BorrowersPage.css';
 import './BorrowerDetailPage.css';
 import './LoanDetailPage.css';
@@ -45,16 +46,18 @@ export function LoanDetailPage() {
   );
 
   return (
-    <div>
+    <div className="page page-loans">
       <button className="back-link" onClick={() => navigate('/loans')}>
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <ArrowIcon size={18} />
         חזרה לרשימת הלוואות
       </button>
 
       <div className="borrower-header">
         <div>
+          <p className="card-eyebrow">
+            <LoanIcon size={16} />
+            כרטיס הלוואה
+          </p>
           <h1>
             הלוואה ל<Link to={`/borrowers/${loan.borrower.id}`}>{loan.borrower.firstName} {loan.borrower.lastName}</Link>
           </h1>

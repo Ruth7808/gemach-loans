@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prismaClient";
 import { HttpError } from "../middleware/errorHandler";
-import { summarizeInstallments } from "../lib/loanMath";
+import { summarizeInstallments, roundCents } from "../lib/loanMath";
+import { getAvailableFunds, calculateWithdrawalRisk } from "../lib/withdrawalRisk";
+
+const EPSILON = 1e-6;
 
 function parseId(raw: string | string[]): number {
   const id = Number(Array.isArray(raw) ? raw[0] : raw);
@@ -70,6 +73,52 @@ export async function getById(req: Request, res: Response) {
 
   const { installments, ...rest } = loan;
   res.json({ ...rest, installments, ...summarizeInstallments(installments, new Date()) });
+}
+
+/** בדיקת סיכון לפני יצירת הלוואה חדשה — אזהרה בלבד, לא חוסמת. */
+export async function checkRisk(req: Request, res: Response) {
+  const body = req.body ?? {};
+  const amount = Number(body.amount);
+  if (!(amount > 0)) {
+    throw new HttpError(400, "סכום ההלוואה חייב להיות גדול מאפס");
+  }
+
+  const currentAvailableFunds = await getAvailableFunds();
+  const hypotheticalAvailableFunds = roundCents(currentAvailableFunds - amount);
+
+  const insufficientFunds = hypotheticalAvailableFunds < -EPSILON;
+  const shortfallAmount = insufficientFunds ? roundCents(Math.max(0, -hypotheticalAvailableFunds)) : 0;
+
+  const [riskBefore, riskAfter] = await Promise.all([
+    calculateWithdrawalRisk(currentAvailableFunds),
+    calculateWithdrawalRisk(hypotheticalAvailableFunds),
+  ]);
+
+  const wasAtRisk = new Set(riskBefore.filter((r) => r.isAtRisk).map((r) => r.requestId));
+  const newlyAtRiskIds = riskAfter.filter((r) => r.isAtRisk && !wasAtRisk.has(r.requestId)).map((r) => r.requestId);
+
+  const newlyAtRiskRequests =
+    newlyAtRiskIds.length === 0
+      ? []
+      : await prisma.withdrawalRequest.findMany({
+          where: { id: { in: newlyAtRiskIds } },
+          include: { depositor: true },
+        });
+
+  const riskAfterByRequestId = new Map(riskAfter.map((r) => [r.requestId, r]));
+  const newlyAtRisk = newlyAtRiskRequests.map((r) => ({
+    requestId: r.id,
+    depositorName: `${r.depositor.firstName} ${r.depositor.lastName}`,
+    targetDate: r.targetDate,
+    shortfall: riskAfterByRequestId.get(r.id)?.shortfall ?? 0,
+  }));
+
+  res.json({
+    hypotheticalAvailableFunds,
+    insufficientFunds,
+    shortfallAmount,
+    newlyAtRisk,
+  });
 }
 
 export async function create(req: Request, res: Response) {

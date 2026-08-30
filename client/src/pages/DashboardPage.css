@@ -4,6 +4,18 @@
   justify-content: space-between;
 }
 
+.stats-row-secondary {
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-value-sub {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
 .charts-row {
   display: flex;
   gap: 20px;
@@ -14,6 +26,18 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+}
+
+.alerts-grid-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.alert-panel-risk {
+  border-inline-start: 3px solid var(--status-risk);
+}
+
+.alert-row-risk:hover {
+  background: var(--status-risk-bg);
 }
 
 .alert-panel {
@@ -60,4 +84,8 @@
   font-weight: 600;
   color: var(--danger);
   font-variant-numeric: tabular-nums;
+}
+
+.alert-amount-risk {
+  color: var(--status-risk);
 }

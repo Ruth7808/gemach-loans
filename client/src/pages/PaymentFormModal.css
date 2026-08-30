@@ -25,7 +25,7 @@
 
 .payment-modal .modal-header {
   padding: 22px 28px;
-  background: linear-gradient(135deg, var(--primary), var(--accent-gold));
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-hover));
   color: #fff;
 }
 

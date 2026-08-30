@@ -9,7 +9,7 @@
   }
 }
 
-.balance-modal {
+.deposit-modal {
   border: none;
   border-radius: 16px;
   padding: 0;
@@ -19,39 +19,29 @@
   animation: modal-in 0.18s ease-out;
 }
 
-.balance-modal::backdrop {
+.deposit-modal::backdrop {
   background: rgba(43, 42, 40, 0.4);
 }
 
-.balance-modal .modal-header {
+.deposit-modal .modal-header {
   padding: 22px 28px;
-  background: linear-gradient(135deg, var(--text), var(--text-muted));
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-hover));
   color: #fff;
 }
 
-.balance-modal .modal-header h2 {
+.deposit-modal .modal-header h2 {
   color: #fff;
   font-size: 21px;
 }
 
-.balance-modal form {
+.deposit-modal form {
   display: flex;
   flex-direction: column;
   gap: 14px;
   padding: 24px 28px 28px;
 }
 
-.balance-warning {
-  background: var(--danger-bg);
-  color: var(--danger);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 10px 12px;
-  border-radius: 8px;
-  margin: 0;
-}
-
-.balance-modal label {
+.deposit-modal label {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -60,7 +50,7 @@
   font-weight: 500;
 }
 
-.balance-modal input {
+.deposit-modal input {
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -68,17 +58,28 @@
   color: var(--text);
 }
 
-.balance-modal input:focus {
-  outline: 2px solid var(--primary);
+.deposit-modal input:focus {
+  outline: 2px solid var(--accent-purple);
   outline-offset: 1px;
 }
 
-.field-error {
-  color: var(--danger);
-  font-size: 13px;
+.deposit-modal input[aria-invalid='true'] {
+  border-color: var(--danger);
 }
 
-.modal-actions {
+.deposit-modal .field-error {
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.deposit-modal .form-error {
+  color: var(--danger);
+  font-size: 14px;
+  margin: 0;
+}
+
+.deposit-modal .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;

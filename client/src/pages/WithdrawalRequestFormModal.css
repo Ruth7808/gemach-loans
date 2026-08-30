@@ -9,7 +9,7 @@
   }
 }
 
-.balance-modal {
+.withdrawal-request-modal {
   border: none;
   border-radius: 16px;
   padding: 0;
@@ -19,39 +19,38 @@
   animation: modal-in 0.18s ease-out;
 }
 
-.balance-modal::backdrop {
+.withdrawal-request-modal::backdrop {
   background: rgba(43, 42, 40, 0.4);
 }
 
-.balance-modal .modal-header {
+.withdrawal-request-modal .modal-header {
   padding: 22px 28px;
-  background: linear-gradient(135deg, var(--text), var(--text-muted));
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-hover));
   color: #fff;
 }
 
-.balance-modal .modal-header h2 {
+.withdrawal-request-modal .modal-header h2 {
   color: #fff;
   font-size: 21px;
 }
 
-.balance-modal form {
+.withdrawal-request-modal form {
   display: flex;
   flex-direction: column;
   gap: 14px;
   padding: 24px 28px 28px;
 }
 
-.balance-warning {
-  background: var(--danger-bg);
-  color: var(--danger);
+.withdrawal-request-modal .modal-hint {
   font-size: 13px;
-  font-weight: 500;
-  padding: 10px 12px;
+  color: var(--text-muted);
+  background: var(--bg);
   border-radius: 8px;
+  padding: 8px 10px;
   margin: 0;
 }
 
-.balance-modal label {
+.withdrawal-request-modal label {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -60,7 +59,7 @@
   font-weight: 500;
 }
 
-.balance-modal input {
+.withdrawal-request-modal input {
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -68,17 +67,28 @@
   color: var(--text);
 }
 
-.balance-modal input:focus {
-  outline: 2px solid var(--primary);
+.withdrawal-request-modal input:focus {
+  outline: 2px solid var(--accent-blue);
   outline-offset: 1px;
 }
 
-.field-error {
-  color: var(--danger);
-  font-size: 13px;
+.withdrawal-request-modal input[aria-invalid='true'] {
+  border-color: var(--danger);
 }
 
-.modal-actions {
+.withdrawal-request-modal .field-error {
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.withdrawal-request-modal .form-error {
+  color: var(--danger);
+  font-size: 14px;
+  margin: 0;
+}
+
+.withdrawal-request-modal .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;

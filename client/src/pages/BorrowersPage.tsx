@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { listBorrowers, type Borrower } from '../api';
 import { BorrowerFormModal } from './BorrowerFormModal';
+import { UserIcon } from '../icons';
 import './BorrowersPage.css';
 
 const currency = new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' });
@@ -40,9 +41,12 @@ export function BorrowersPage() {
   }
 
   return (
-    <div>
+    <div className="page page-borrowers">
       <div className="page-header">
-        <h1>לווים</h1>
+        <h1>
+          <span className="page-header-icon"><UserIcon size={26} /></span>
+          לווים
+        </h1>
         <button className="btn-primary" onClick={() => setShowAddModal(true)}>
           הוסף לווה
         </button>

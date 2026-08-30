@@ -1,3 +1,9 @@
+.page-title-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .tabs {
   display: flex;
   gap: 8px;
@@ -21,7 +27,12 @@
 }
 
 .tab-active {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
   color: #fff;
+}
+
+.page-withdrawal-requests .tab-active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
 }

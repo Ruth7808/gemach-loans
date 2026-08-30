@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { createBorrower, updateBorrower, type Borrower, type NewBorrower } from '../api';
+import { createDepositor, updateDepositor, type Depositor, type NewDepositor } from '../api';
 import { FieldIcon } from '../icons';
-import './BorrowerFormModal.css';
+import './DepositorFormModal.css';
 
 interface Props {
-  borrower?: Borrower;
+  depositor?: Depositor;
   onClose: () => void;
   onSaved: () => void;
 }
@@ -15,19 +15,19 @@ interface FieldErrors {
   phone?: string;
 }
 
-export function BorrowerFormModal({ borrower, onClose, onSaved }: Props) {
-  const isEdit = Boolean(borrower);
+export function DepositorFormModal({ depositor, onClose, onSaved }: Props) {
+  const isEdit = Boolean(depositor);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [saving, setSaving] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
 
-  const [firstName, setFirstName] = useState(borrower?.firstName ?? '');
-  const [lastName, setLastName] = useState(borrower?.lastName ?? '');
-  const [phone, setPhone] = useState(borrower?.phone ?? '');
-  const [email, setEmail] = useState(borrower?.email ?? '');
-  const [address, setAddress] = useState(borrower?.address ?? '');
-  const [notes, setNotes] = useState(borrower?.notes ?? '');
+  const [firstName, setFirstName] = useState(depositor?.firstName ?? '');
+  const [lastName, setLastName] = useState(depositor?.lastName ?? '');
+  const [phone, setPhone] = useState(depositor?.phone ?? '');
+  const [email, setEmail] = useState(depositor?.email ?? '');
+  const [address, setAddress] = useState(depositor?.address ?? '');
+  const [notes, setNotes] = useState(depositor?.notes ?? '');
 
   useEffect(() => {
     dialogRef.current?.showModal();
@@ -50,7 +50,7 @@ export function BorrowerFormModal({ borrower, onClose, onSaved }: Props) {
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
 
-    const data: NewBorrower = {
+    const data: NewDepositor = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       phone: phone.trim(),
@@ -62,23 +62,23 @@ export function BorrowerFormModal({ borrower, onClose, onSaved }: Props) {
     setSaving(true);
     setSubmitError(null);
     try {
-      if (borrower) {
-        await updateBorrower(borrower.id, data);
+      if (depositor) {
+        await updateDepositor(depositor.id, data);
       } else {
-        await createBorrower(data);
+        await createDepositor(data);
       }
       onSaved();
     } catch {
-      setSubmitError('שמירת הלווה נכשלה. נסי שוב.');
+      setSubmitError('שמירת המפקיד נכשלה. נסי שוב.');
       setSaving(false);
     }
   }
 
   return (
-    <dialog ref={dialogRef} className="borrower-modal" onClose={onClose}>
+    <dialog ref={dialogRef} className="depositor-modal" onClose={onClose}>
       <div className="modal-header">
         <div className="modal-avatar">{initials}</div>
-        <h2>{isEdit ? 'עריכת לווה' : 'הוספת לווה'}</h2>
+        <h2>{isEdit ? 'עריכת מפקיד' : 'הוספת מפקיד'}</h2>
       </div>
 
       <form onSubmit={handleSubmit}>

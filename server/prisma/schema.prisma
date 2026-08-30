@@ -72,3 +72,54 @@ model Setting {
   key   String @id
   value String
 }
+
+model Depositor {
+  id        Int       @id @default(autoincrement())
+  firstName String
+  lastName  String
+  phone     String
+  email     String?
+  address   String?
+  notes     String?
+  createdAt DateTime  @default(now())
+  deposits  Deposit[]
+  withdrawalRequests WithdrawalRequest[]
+  withdrawals        Withdrawal[]
+}
+
+model Deposit {
+  id          Int       @id @default(autoincrement())
+  depositorId Int
+  amount      Float
+  date        DateTime
+  notes       String?
+  createdAt   DateTime  @default(now())
+  depositor   Depositor @relation(fields: [depositorId], references: [id])
+}
+
+model WithdrawalRequest {
+  id          Int          @id @default(autoincrement())
+  depositorId Int
+  amount      Float
+  requestDate DateTime
+  targetDate  DateTime
+  status      String       @default("open")
+  paidSoFar   Float        @default(0)
+  notes       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  depositor   Depositor    @relation(fields: [depositorId], references: [id])
+  withdrawals Withdrawal[]
+}
+
+model Withdrawal {
+  id                  Int                @id @default(autoincrement())
+  withdrawalRequestId Int?
+  depositorId         Int
+  amount              Float
+  date                DateTime
+  notes               String?
+  createdAt           DateTime           @default(now())
+  withdrawalRequest   WithdrawalRequest? @relation(fields: [withdrawalRequestId], references: [id])
+  depositor           Depositor          @relation(fields: [depositorId], references: [id])
+}

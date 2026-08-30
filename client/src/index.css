@@ -13,6 +13,19 @@
   --danger-bg: #f7e4de;
 
   --accent-gold: #b8863e;
+  --accent-gold-bg: #f3e6cc;
+  --accent-gold-hover: #96692f;
+
+  --accent-purple: #5b3a7a;
+  --accent-purple-bg: #efe6f6;
+  --accent-purple-hover: #452c60;
+
+  --accent-blue: #2d5f8a;
+  --accent-blue-bg: #dce8f2;
+  --accent-blue-hover: #1f4563;
+
+  --status-risk: #c1620a;
+  --status-risk-bg: #fbe4cc;
 
   --font-display: 'Frank Ruhl Libre', Georgia, serif;
   --font-body: 'Heebo', system-ui, 'Segoe UI', Roboto, sans-serif;

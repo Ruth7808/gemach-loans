@@ -1,9 +1,12 @@
 import { NavLink } from 'react-router';
+import { HomeIcon, UserIcon, LoanIcon, DepositorIcon, WithdrawalIcon } from '../icons';
 
 const links = [
-  { to: '/', label: 'דשבורד' },
-  { to: '/borrowers', label: 'לווים' },
-  { to: '/loans', label: 'הלוואות' },
+  { to: '/', label: 'דשבורד', Icon: HomeIcon, accent: 'primary' as const },
+  { to: '/borrowers', label: 'לווים', Icon: UserIcon, accent: 'primary' as const },
+  { to: '/loans', label: 'הלוואות', Icon: LoanIcon, accent: 'gold' as const },
+  { to: '/depositors', label: 'מפקידים', Icon: DepositorIcon, accent: 'purple' as const },
+  { to: '/withdrawal-requests', label: 'בקשות משיכה', Icon: WithdrawalIcon, accent: 'blue' as const },
 ];
 
 export function Nav() {
@@ -16,8 +19,9 @@ export function Nav() {
             <NavLink
               to={link.to}
               end={link.to === '/'}
-              className={({ isActive }) => (isActive ? 'active' : undefined)}
+              className={({ isActive }) => `nav-${link.accent}${isActive ? ' active' : ''}`}
             >
+              <link.Icon size={18} />
               {link.label}
             </NavLink>
           </li>
