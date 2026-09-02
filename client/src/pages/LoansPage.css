@@ -36,3 +36,8 @@
   background: var(--accent-blue);
   border-color: var(--accent-blue);
 }
+
+.page-loan-requests .tab-active {
+  background: var(--accent-teal);
+  border-color: var(--accent-teal);
+}

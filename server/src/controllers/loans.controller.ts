@@ -3,6 +3,7 @@ import { prisma } from "../lib/prismaClient";
 import { HttpError } from "../middleware/errorHandler";
 import { summarizeInstallments, roundCents } from "../lib/loanMath";
 import { getAvailableFunds, calculateWithdrawalRisk } from "../lib/withdrawalRisk";
+import { createLoanWithInstallments } from "../lib/loanCreation";
 
 const EPSILON = 1e-6;
 
@@ -148,25 +149,9 @@ export async function create(req: Request, res: Response) {
     throw new HttpError(400, "לווה לא נמצא");
   }
 
-  const installmentAmount = Math.ceil((amount / numInstallments) * 100) / 100;
-
-  const loan = await prisma.$transaction(async (tx) => {
-    const created = await tx.loan.create({
-      data: { borrowerId, amount, givenDate, numInstallments, notes },
-    });
-    await tx.installment.createMany({
-      data: dueDates.map((dueDate, i) => ({
-        loanId: created.id,
-        number: i + 1,
-        dueDate,
-        amount: installmentAmount,
-      })),
-    });
-    return tx.loan.findUniqueOrThrow({
-      where: { id: created.id },
-      include: { installments: { orderBy: { number: "asc" } } },
-    });
-  });
+  const loan = await prisma.$transaction((tx) =>
+    createLoanWithInstallments(tx, { borrowerId, amount, numInstallments, givenDate, installmentDueDates: dueDates, notes }),
+  );
 
   res.status(201).json(loan);
 }

@@ -8,16 +8,17 @@ datasource db {
 }
 
 model Borrower {
-  id         Int      @id @default(autoincrement())
-  firstName  String
-  lastName   String
-  phone      String
-  email      String?
-  address    String?
-  notes      String?
-  createdAt  DateTime @default(now())
-  loans      Loan[]
-  payments   Payment[]
+  id           Int           @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  phone        String
+  email        String?
+  address      String?
+  notes        String?
+  createdAt    DateTime      @default(now())
+  loans        Loan[]
+  payments     Payment[]
+  loanRequests LoanRequest[]
 }
 
 model Loan {
@@ -32,6 +33,7 @@ model Loan {
   borrower        Borrower      @relation(fields: [borrowerId], references: [id])
   installments    Installment[]
   payments        Payment[]
+  loanRequest     LoanRequest?
 }
 
 model Installment {
@@ -122,4 +124,24 @@ model Withdrawal {
   createdAt           DateTime           @default(now())
   withdrawalRequest   WithdrawalRequest? @relation(fields: [withdrawalRequestId], references: [id])
   depositor           Depositor          @relation(fields: [depositorId], references: [id])
+}
+
+model LoanRequest {
+  id              Int       @id @default(autoincrement())
+  source          String    @default("manual") // manual | fillout
+  externalId      String?
+  borrowerId      Int?
+  nameAsEntered   String
+  phoneAsEntered  String
+  amount          Float
+  numInstallments Int?
+  notes           String?
+  rawFormData     String?
+  status          String    @default("pending") // pending | rejected | converted
+  loanId          Int?      @unique
+  requestDate     DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  borrower        Borrower? @relation(fields: [borrowerId], references: [id])
+  loan            Loan?     @relation(fields: [loanId], references: [id])
 }

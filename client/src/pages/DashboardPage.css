@@ -32,6 +32,10 @@
   grid-template-columns: 1fr 1fr 1fr;
 }
 
+.alerts-grid-4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
 .alert-panel-risk {
   border-inline-start: 3px solid var(--status-risk);
 }

@@ -66,6 +66,11 @@
   color: var(--accent-blue);
 }
 
+.app-nav a.nav-teal.active {
+  background: var(--accent-teal-bg);
+  color: var(--accent-teal);
+}
+
 .app-main {
   flex: 1;
   padding: 40px 48px;

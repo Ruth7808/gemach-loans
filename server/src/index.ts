@@ -8,6 +8,7 @@ import { depositorsRouter } from "./routes/depositors.routes";
 import { depositsRouter } from "./routes/deposits.routes";
 import { withdrawalRequestsRouter } from "./routes/withdrawalRequests.routes";
 import { withdrawalsRouter } from "./routes/withdrawals.routes";
+import { loanRequestsRouter } from "./routes/loanRequests.routes";
 import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
@@ -28,6 +29,7 @@ app.use("/api/depositors", depositorsRouter);
 app.use("/api/deposits", depositsRouter);
 app.use("/api/withdrawal-requests", withdrawalRequestsRouter);
 app.use("/api/withdrawals", withdrawalsRouter);
+app.use("/api/loan-requests", loanRequestsRouter);
 
 app.use(errorHandler);
 

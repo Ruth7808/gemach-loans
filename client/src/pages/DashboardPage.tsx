@@ -28,7 +28,13 @@ export function DashboardPage() {
   }
 
   const lateBorrowers = [...borrowers].filter((b) => b.isLate).sort((a, b) => b.totalOwed - a.totalOwed);
-  const hasAlerts = lateBorrowers.length > 0 || data.dueToday.length > 0 || data.atRiskWithdrawals.length > 0;
+  const hasAlerts =
+    lateBorrowers.length > 0 ||
+    data.dueToday.length > 0 ||
+    data.atRiskWithdrawals.length > 0 ||
+    data.pendingLoanRequests.length > 0;
+  const extraPanels = (data.atRiskWithdrawals.length > 0 ? 1 : 0) + (data.pendingLoanRequests.length > 0 ? 1 : 0);
+  const alertsGridClass = extraPanels === 2 ? 'alerts-grid-4' : extraPanels === 1 ? 'alerts-grid-3' : '';
 
   return (
     <div className="page page-dashboard">
@@ -81,7 +87,7 @@ export function DashboardPage() {
       {!hasAlerts && <p className="empty-state">אין פעולות דחופות כרגע.</p>}
 
       {hasAlerts && (
-        <div className={`alerts-grid ${data.atRiskWithdrawals.length > 0 ? 'alerts-grid-3' : ''}`}>
+        <div className={`alerts-grid ${alertsGridClass}`}>
           <div className="alert-panel">
             <p className="alert-panel-title">לווים באיחור</p>
             {lateBorrowers.length === 0 && <p className="alert-empty">אין לווים באיחור.</p>}
@@ -115,6 +121,22 @@ export function DashboardPage() {
                 >
                   <span>{item.depositorName}</span>
                   <span className="alert-amount alert-amount-risk">חוסר {currency.format(item.shortfall)}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {data.pendingLoanRequests.length > 0 && (
+            <div className="alert-panel">
+              <p className="alert-panel-title">בקשות הלוואה ממתינות</p>
+              {data.pendingLoanRequests.map((item) => (
+                <button
+                  key={item.requestId}
+                  className="alert-row"
+                  onClick={() => navigate(`/loan-requests/${item.requestId}`)}
+                >
+                  <span>{item.name}</span>
+                  <span className="alert-amount">{currency.format(item.amount)}</span>
                 </button>
               ))}
             </div>

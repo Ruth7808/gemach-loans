@@ -1,0 +1,39 @@
+.risk-warning {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.risk-warning-severe {
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 0;
+}
+
+.risk-warning-moderate {
+  background: var(--status-risk-bg);
+  color: var(--status-risk);
+  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.risk-warning-moderate p {
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.risk-warning-moderate ul {
+  margin: 0;
+  padding-inline-start: 18px;
+}
+
+.risk-warning-note {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}

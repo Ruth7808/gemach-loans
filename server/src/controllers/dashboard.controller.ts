@@ -35,6 +35,7 @@ export async function getDashboard(_req: Request, res: Response) {
     upcomingInstallments,
     openWithdrawalRequests,
     riskResults,
+    pendingLoanRequests,
   ] = await Promise.all([
     prisma.setting.findUnique({ where: { key: OPENING_BALANCE_KEY } }),
     getAvailableFunds(),
@@ -55,6 +56,10 @@ export async function getDashboard(_req: Request, res: Response) {
       include: { depositor: true },
     }),
     calculateWithdrawalRisk(),
+    prisma.loanRequest.findMany({
+      where: { status: "pending" },
+      orderBy: { requestDate: "asc" },
+    }),
   ]);
 
   const openingBalance = openingBalanceSetting ? Number(openingBalanceSetting.value) : 0;
@@ -124,5 +129,10 @@ export async function getDashboard(_req: Request, res: Response) {
     openWithdrawalRequestsCount: openWithdrawalRequests.length,
     openWithdrawalRequestsTotal: openWithdrawalTotal,
     atRiskWithdrawals,
+    pendingLoanRequests: pendingLoanRequests.map((r) => ({
+      requestId: r.id,
+      name: r.nameAsEntered,
+      amount: r.amount,
+    })),
   });
 }

@@ -1,0 +1,84 @@
+.page-loan-requests .card-eyebrow {
+  color: var(--accent-teal);
+}
+
+.page-loan-requests .balance-tile {
+  background: linear-gradient(135deg, var(--accent-teal), var(--accent-teal-hover));
+}
+
+.duplicate-warning {
+  background: var(--status-risk-bg);
+  color: var(--status-risk);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 0 0 20px;
+}
+
+.borrower-match-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.borrower-match-confirmed {
+  border-color: var(--accent-teal);
+  background: var(--accent-teal-bg);
+}
+
+.borrower-match-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.borrower-match-actions .search-box {
+  flex: 1;
+}
+
+.borrower-match-results {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.borrower-match-results li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.borrower-match-results li:last-child {
+  border-bottom: none;
+}
+
+.convert-loan-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.reject-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.reject-row .search-box {
+  flex: 1;
+}

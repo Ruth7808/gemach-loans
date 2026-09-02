@@ -195,6 +195,12 @@ export interface AtRiskWithdrawal {
   shortfall: number;
 }
 
+export interface PendingLoanRequestItem {
+  requestId: number;
+  name: string;
+  amount: number;
+}
+
 export interface DashboardData {
   openingBalance: number;
   availableFunds: number;
@@ -206,6 +212,7 @@ export interface DashboardData {
   openWithdrawalRequestsCount: number;
   openWithdrawalRequestsTotal: number;
   atRiskWithdrawals: AtRiskWithdrawal[];
+  pendingLoanRequests: PendingLoanRequestItem[];
 }
 
 export function getDashboard(): Promise<DashboardData> {
@@ -372,6 +379,98 @@ export interface NewDeposit {
 
 export function createDeposit(data: NewDeposit): Promise<Deposit> {
   return apiFetch('/deposits', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export interface LoanRequestBorrower {
+  id: number;
+  firstName: string;
+  lastName: string;
+  phone: string;
+}
+
+export interface LoanRequest {
+  id: number;
+  source: string;
+  externalId: string | null;
+  borrowerId: number | null;
+  nameAsEntered: string;
+  phoneAsEntered: string;
+  amount: number;
+  numInstallments: number | null;
+  notes: string | null;
+  status: string;
+  loanId: number | null;
+  requestDate: string;
+  createdAt: string;
+  updatedAt: string;
+  duplicatePhone: boolean;
+  borrower: LoanRequestBorrower | null;
+}
+
+export interface LoanRequestDetail extends LoanRequest {
+  loan: LoanDetail | null;
+  suggestedBorrower: LoanRequestBorrower | null;
+}
+
+export interface NewLoanRequest {
+  name: string;
+  phone: string;
+  amount: number;
+  numInstallments?: number;
+  notes?: string;
+}
+
+export interface UpdateLoanRequest {
+  name?: string;
+  phone?: string;
+  amount?: number;
+  numInstallments?: number | null;
+  notes?: string;
+  borrowerId?: number | null;
+}
+
+export interface ConvertLoanRequestToLoan {
+  amount: number;
+  numInstallments: number;
+  givenDate: string;
+  installmentDueDates: string[];
+  notes?: string;
+}
+
+export function listLoanRequests(status?: string): Promise<LoanRequest[]> {
+  return apiFetch(status ? `/loan-requests?status=${status}` : '/loan-requests');
+}
+
+export function getLoanRequest(id: number): Promise<LoanRequestDetail> {
+  return apiFetch(`/loan-requests/${id}`);
+}
+
+export function createLoanRequest(data: NewLoanRequest): Promise<LoanRequest> {
+  return apiFetch('/loan-requests', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateLoanRequest(id: number, data: UpdateLoanRequest): Promise<LoanRequest> {
+  return apiFetch(`/loan-requests/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export function rejectLoanRequest(id: number, note?: string): Promise<LoanRequest> {
+  return apiFetch(`/loan-requests/${id}/reject`, {
+    method: 'POST',
+    body: JSON.stringify({ note }),
+  });
+}
+
+export function convertLoanRequestToLoan(id: number, data: ConvertLoanRequestToLoan): Promise<LoanRequestDetail> {
+  return apiFetch(`/loan-requests/${id}/convert-to-loan`, {
     method: 'POST',
     body: JSON.stringify(data),
   });

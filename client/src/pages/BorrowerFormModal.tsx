@@ -5,8 +5,9 @@ import './BorrowerFormModal.css';
 
 interface Props {
   borrower?: Borrower;
+  prefill?: { firstName?: string; lastName?: string; phone?: string };
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (borrower: Borrower) => void;
 }
 
 interface FieldErrors {
@@ -15,16 +16,16 @@ interface FieldErrors {
   phone?: string;
 }
 
-export function BorrowerFormModal({ borrower, onClose, onSaved }: Props) {
+export function BorrowerFormModal({ borrower, prefill, onClose, onSaved }: Props) {
   const isEdit = Boolean(borrower);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [saving, setSaving] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
 
-  const [firstName, setFirstName] = useState(borrower?.firstName ?? '');
-  const [lastName, setLastName] = useState(borrower?.lastName ?? '');
-  const [phone, setPhone] = useState(borrower?.phone ?? '');
+  const [firstName, setFirstName] = useState(borrower?.firstName ?? prefill?.firstName ?? '');
+  const [lastName, setLastName] = useState(borrower?.lastName ?? prefill?.lastName ?? '');
+  const [phone, setPhone] = useState(borrower?.phone ?? prefill?.phone ?? '');
   const [email, setEmail] = useState(borrower?.email ?? '');
   const [address, setAddress] = useState(borrower?.address ?? '');
   const [notes, setNotes] = useState(borrower?.notes ?? '');
@@ -62,12 +63,8 @@ export function BorrowerFormModal({ borrower, onClose, onSaved }: Props) {
     setSaving(true);
     setSubmitError(null);
     try {
-      if (borrower) {
-        await updateBorrower(borrower.id, data);
-      } else {
-        await createBorrower(data);
-      }
-      onSaved();
+      const saved = borrower ? await updateBorrower(borrower.id, data) : await createBorrower(data);
+      onSaved(saved);
     } catch {
       setSubmitError('שמירת הלווה נכשלה. נסי שוב.');
       setSaving(false);

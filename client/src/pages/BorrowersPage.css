@@ -189,6 +189,11 @@
   border-bottom-width: 2px;
 }
 
+.page-loan-requests .borrowers-table th {
+  border-bottom-color: var(--accent-teal);
+  border-bottom-width: 2px;
+}
+
 .page-header-icon {
   display: inline-flex;
   align-items: center;
@@ -205,4 +210,8 @@
 
 .page-withdrawal-requests .page-header-icon {
   color: var(--accent-blue);
+}
+
+.page-loan-requests .page-header-icon {
+  color: var(--accent-teal);
 }

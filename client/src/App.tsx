@@ -8,6 +8,8 @@ import { LoanDetailPage } from './pages/LoanDetailPage';
 import { DepositorsPage } from './pages/DepositorsPage';
 import { DepositorDetailPage } from './pages/DepositorDetailPage';
 import { WithdrawalRequestsPage } from './pages/WithdrawalRequestsPage';
+import { LoanRequestsPage } from './pages/LoanRequestsPage';
+import { LoanRequestReviewPage } from './pages/LoanRequestReviewPage';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
         <Route path="depositors" element={<DepositorsPage />} />
         <Route path="depositors/:id" element={<DepositorDetailPage />} />
         <Route path="withdrawal-requests" element={<WithdrawalRequestsPage />} />
+        <Route path="loan-requests" element={<LoanRequestsPage />} />
+        <Route path="loan-requests/:id" element={<LoanRequestReviewPage />} />
       </Route>
     </Routes>
   );

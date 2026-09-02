@@ -112,6 +112,23 @@ export function WithdrawalIcon({ size = 18 }: IconProps) {
   );
 }
 
+export function LoanRequestIcon({ size = 18 }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+      <rect x="6" y="4" width="12" height="17" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M9 12h6M9 16h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function ArrowIcon({ size = 18 }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
